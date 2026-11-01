@@ -1,0 +1,29 @@
+name: Build FireSword
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Unzip and build
+        run: |
+          unzip -q FireSword.zip
+          cd FireSword
+          mvn -B package
+      - name: Publish jar to Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: FireSword build ${{ github.run_number }}
+          files: FireSword/target/FireSword-1.0.0.jar
